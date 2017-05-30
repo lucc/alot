@@ -76,15 +76,11 @@ before_script: |
 # Install or mock dependencies for alot as the package has to be imported
 # during generation of the docs.
 install:
-  # urwid needs to be installed first.  The installation of urwidtrees will
-  # fail otherwise.
-  # TODO This should be fixed upstream.
-  - pip install urwid
   # Install alot and the dependencies it declares.
   - |
     set -e
     if [[ $JOB = docs ]]; then
-      pip install configobj twisted python-magic urwidtrees
+      pip install configobj twisted python-magic urwid urwidtrees
       # Mock all "difficult" dependencies of alot in order to be able to import
       # alot when rebuilding the documentation.  Notmuch would have to be
       # installed by hand in order to get a recent enough version on travis.
