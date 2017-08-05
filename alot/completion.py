@@ -437,10 +437,10 @@ class CommandCompleter(Completer):
                                                                    localpos)
 
                         # prepend 'set ' + header and correct position
-                        def f((completed, pos)):
+                        def f(completed, pos):
                             return ('%s %s' % (header, completed),
                                     pos + len(header) + 1)
-                        res = [f(r) for r in res]
+                        res = [f(*r) for r in res]
                         logging.debug(res)
 
                 elif self.mode == 'envelope' and cmd == 'unset':
