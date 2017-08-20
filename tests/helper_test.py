@@ -23,6 +23,7 @@ import datetime
 import email
 import errno
 import random
+import re
 import textwrap
 import unittest
 
@@ -385,14 +386,12 @@ class TestCallCmd(unittest.TestCase):
 
 class TestEmailAsString(unittest.TestCase):
 
-    @unittest.expectedFailure
     def test_empty_message(self):
         message = email.message.Message()
         actual = helper.email_as_string(message)
         expected = '\r\n'
         self.assertEqual(actual, expected)
 
-    @unittest.expectedFailure
     def test_simple_message(self):
         mailstring = textwrap.dedent("""\
             From: me
@@ -473,5 +472,16 @@ class TestEmailAsString(unittest.TestCase):
         envelope = Envelope(bodytext=u'föö\nbär\nbäz')
         mail = envelope.construct_mail()
         actual = helper.email_as_string(mail)
-        expected = 'foo bar baz'
+        expected = textwrap.dedent("""\
+            Content-Type: text/plain; charset="utf-8"\r
+            MIME-Version: 1.0\r
+            Content-Transfer-Encoding: quoted-printable\r
+            \r
+            f=C3=B6=C3=B6\r
+            b=C3=A4r\r
+            b=C3=A4z""")
+        # Remove some data that changes between test runs.  Use \n and \r like
+        # ^ and $ in regex.
+        actual = re.sub('\nMessage-ID: <.*>\r', '', actual, flags=re.MULTILINE)
+        actual = re.sub('\nUser-Agent: alot/.*\r', '', actual, flags=re.MULTILINE)
         self.assertEqual(actual, expected)
