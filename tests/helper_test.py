@@ -20,8 +20,10 @@
 from __future__ import absolute_import
 
 import datetime
+import email
 import errno
 import random
+import textwrap
 import unittest
 
 import mock
@@ -379,3 +381,27 @@ class TestCallCmd(unittest.TestCase):
         self.assertEqual(out, u'')
         self.assertEqual(err, u'foobar')
         self.assertEqual(code, 42)
+
+
+class TestEmailAsString(unittest.TestCase):
+
+    @unittest.expectedFailure
+    def test_empty_message(self):
+        message = email.message.Message()
+        actual = helper.email_as_string(message)
+        expected = '\r\n'
+        self.assertEqual(actual, expected)
+
+    @unittest.expectedFailure
+    def test_simple_message(self):
+        mailstring = textwrap.dedent("""\
+            From: me
+            To: you
+            Subject: foo
+
+            bar
+            """)
+        message = email.message_from_string(mailstring)
+        actual = helper.email_as_string(message)
+        expected = mailstring.replace('\n', '\r\n')
+        self.assertEqual(actual, expected)
