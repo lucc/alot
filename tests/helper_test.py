@@ -405,3 +405,50 @@ class TestEmailAsString(unittest.TestCase):
         actual = helper.email_as_string(message)
         expected = mailstring.replace('\n', '\r\n')
         self.assertEqual(actual, expected)
+
+    def test_simple_signed_message(self):
+        mailstring = textwrap.dedent("""\
+            Content-Type: multipart/signed; protocol="application/pgp-signature";
+             micalg="pgp-sha256"; boundary="===============2871071127483640724=="
+            MIME-Version: 1.0
+            Content-Disposition: inline
+            To: hans
+            Message-ID: <150323734790.9668.12008139903940506787@localhost.localdomain>
+            From: l-m-h@web.de
+            User-Agent: alot/0.7.0dev
+            Subject: hans
+            Date: Sun, 20 Aug 2017 15:55:47 +0200
+
+            --===============2871071127483640724==
+            Content-Type: text/plain; charset="utf-8"
+            MIME-Version: 1.0
+            Content-Transfer-Encoding: quoted-printable
+
+            hans
+
+            --===============2871071127483640724==
+            MIME-Version: 1.0
+            Content-Transfer-Encoding: 7bit
+            Content-Description: signature
+            Content-Type: application/pgp-signature; name="signature.asc"; charset="us-ascii"
+
+            -----BEGIN PGP SIGNATURE-----
+
+            iQEzBAABCAAdFiEE96z4mcwnF18GSMtNYLcfxwAaQaEFAlmZlOMACgkQYLcfxwAa
+            QaFf5QgAlFg0H8tR4IPLxEqT7xdPgUIJso/vBdHyccp44X4gIibp2ZbjR/rBcbSH
+            ipyX/dxnxn4QtHbIKG6VUpJG4uEnfO9CXAYbRtUOh/qfZuVc0IuugRW/wD++SYT0
+            8EbKhrhCIG6qzq+be9D8CA4d922+Iaj2dmtp4I3WjwFar8uJh6bDG+MSFKWhakma
+            jeh39gWVgB1AzDAm9Dgj7WkzJvENA8aIqoR9r8RdzS7drx+/kNQ1cYcgKFUQPOiq
+            8+u2RRg4g9wky2oVr9HZLSEsVaxaiuDY18htZTTraW9rgxsgVO14hBhkTqFbJov9
+            UjUkJoEMmvPKKl/OczlYZ2/IYbWGeQ==
+            =zKBj
+            -----END PGP SIGNATURE-----
+
+            --===============2871071127483640724==--
+            """)
+        message = email.message_from_string(mailstring)
+        actual = helper.email_as_string(message)
+        expected = mailstring.replace('\n', '\r\n')
+        a1 = actual.split('\n\r')
+        e1 = expected.split('\n\r')
+        self.assertListEqual(a1, e1)
