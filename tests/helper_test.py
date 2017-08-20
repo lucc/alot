@@ -452,3 +452,26 @@ class TestEmailAsString(unittest.TestCase):
         a1 = actual.split('\n\r')
         e1 = expected.split('\n\r')
         self.assertListEqual(a1, e1)
+
+    def test_simple_unicode_message(self):
+        mailstring = textwrap.dedent("""\
+            From: me
+            To: you
+            Subject: foo
+            Content-Type: text/plain; charset="utf-8"
+            Content-Transfer-Encoding: quoted-printable
+
+            b=C3=A4r
+            """)
+        message = email.message_from_string(mailstring)
+        actual = helper.email_as_string(message)
+        expected = mailstring.replace('\n', '\r\n')
+        self.assertEqual(actual, expected)
+
+    def test_mail_constructed_from_envelope(self):
+        from alot.db.envelope import Envelope
+        envelope = Envelope(bodytext=u'föö\nbär\nbäz')
+        mail = envelope.construct_mail()
+        actual = helper.email_as_string(mail)
+        expected = 'foo bar baz'
+        self.assertEqual(actual, expected)
