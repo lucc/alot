@@ -37,7 +37,7 @@ addons:
 
       # dependencies to build the python-gpg module from source
       - swig
-      - libgpgme11
+      - libgpgme-dev
 
 # Build notmuch and the python notmuch libs manually.  The versions of the
 # notmuch library and the python module which are available in the 12.04 and
